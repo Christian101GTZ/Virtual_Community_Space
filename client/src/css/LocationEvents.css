@@ -1,39 +1,73 @@
-.location-events {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: no-wrap;
-}
+/* Location detail page (pages/LocationEvents.jsx).
+   --accent is this location's color, set on the page wrapper from regions.js. */
 
-.location-events header {
-    background-color: var(--main-color);
+/* Photo on the left (2 parts wide), info on the right (3 parts). minmax(0, ...)
+   stops long words from pushing the columns wider than the screen. */
+.location-header {
     display: grid;
-    grid-template-columns: 1fr 2fr;
-    column-gap: 10px;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 2rem;
+    align-items: center;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
 }
 
+.location-image {
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--accent);
+}
+
+/* Same shape for every photo (aspect-ratio + object-fit crops it to fit),
+   turned black and white with extra contrast to match the metal look */
 .location-image img {
-    width: 300px;
-    height: auto;
-    border: 1px solid white;
-    margin-left: 20px;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.15) brightness(0.85);
 }
 
-.location-events header p {
-    color: white;
-    font-size: 0.8em;
-    margin-bottom: 0px;
+#root .location-info h2 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.05;
 }
 
-.location-events main {
-    text-align: center;
-    padding: 30px;
-    margin: 30px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+.location-place {
+    font-family: var(--font-heading);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0.5rem 0 1rem;
 }
 
-.location-events main i {
-    margin-right: 10px;
+.location-description {
+    color: var(--ash);
+    margin: 0;
+}
+
+#root .events-heading {
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    margin: 2rem 0 1rem;
+}
+
+/* Event cards: as many 250px+ columns as fit, wrapping onto new rows */
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.25rem;
+}
+
+.no-events,
+.location-status {
+    color: var(--ash);
+    padding: 2rem 0;
+}
+
+/* On phones, stack the photo above the info */
+@media (max-width: 700px) {
+    .location-header {
+        grid-template-columns: 1fr;
+    }
 }

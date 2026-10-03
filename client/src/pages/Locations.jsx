@@ -1,83 +1,165 @@
 import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import LocationsAPI from '../services/LocationsAPI'
-import unitygrid from '../assets/unitygrid.jpg'
+import { MAP_WIDTH, MAP_HEIGHT, landPath, borderPath, gridPath, stopPositions, towns } from '../data/europeMap'
+import { regions } from '../data/regions'
 import '../css/Locations.css'
 
+// Builds the SVG path string for the tour road, connecting each stop to the next.
+// "M x y" moves the pen to the first stop. "Q cx cy x y" draws a curve to the next stop,
+// pulled toward a control point (cx, cy) that sits a bit to the side of the straight line,
+// so each leg bends slightly and reads as a road instead of a ruler line.
+const buildRoute = (stops) => stops.map((stop, i) => {
+    if (i === 0) return `M ${stop.x} ${stop.y}`
+
+    const prev = stops[i - 1]
+
+    // Midpoint between the previous stop and this one
+    const midX = (prev.x + stop.x) / 2
+    const midY = (prev.y + stop.y) / 2
+
+    // Push the midpoint sideways (perpendicular to the leg) to get the curve's control point
+    const bendX = midX - (stop.y - prev.y) * 0.18
+    const bendY = midY + (stop.x - prev.x) * 0.18
+
+    return `Q ${bendX} ${bendY} ${stop.x} ${stop.y}`
+}).join(' ')
+
+// Front page: a road map of Europe with one clickable tour stop per location
 const Locations = () => {
-
     const [locations, setLocations] = useState([])
-    const [venueNames, setVenueNames] = useState({venue1: '', venue2: '', venue3: '', venue4: ''})
+    const [error, setError] = useState('')
+    const navigate = useNavigate()
 
+    // Load all locations from the API once, when the page first renders
     useEffect(() => {
         (async () => {
             try {
                 const locationsData = await LocationsAPI.getAllLocations()
                 setLocations(locationsData)
-
-                setVenueNames({venue1: locationsData[0].name, venue2: locationsData[1].name, venue3: locationsData[2].name, venue4: locationsData[3].name})
-                setListeners()
             }
-            catch (error) {
-                throw error
+            catch (err) {
+                setError(err.message)
             }
-        }) ()
+        })()
     }, [])
 
-    const setListeners = () => {
-        const polygons = document.querySelectorAll('polygon')
+    // Combine each location from the database with its map position (europeMap.js)
+    // and its stop number, color and label side (regions.js), then sort by tour order.
+    // Locations without a map position or region are skipped so they can't break the map.
+    const stops = locations
+        .filter(location => stopPositions[location.slug] && regions[location.slug])
+        .map(location => ({ ...location, ...stopPositions[location.slug], ...regions[location.slug] }))
+        .sort((a, b) => a.stop - b.stop)
 
-        polygons.forEach(element => {
-            element.addEventListener('mouseover', (event) => {
-                const buttonElement = document.getElementById(`${event.target.id}button`)
-                buttonElement.style.opacity = 1;
-            })
+    const route = buildRoute(stops)
 
-            element.addEventListener('mouseleave', (event) => {
-                const buttonElement = document.getElementById(`${event.target.id}button`)
-                buttonElement.style.opacity = 0;
-            })
-        })
+    // SVG shapes aren't real links, so let keyboard users open a stop with Enter or Space
+    const handleKeyDown = (event, slug) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            navigate(`/${slug}`)
+        }
     }
 
     return (
-        <div className='available-locations'>
-            <div id='venue1button' className='venue1-button-overlay'>
-                <button>{venueNames.venue1}</button>
+        <section className='tour'>
+            <div className='tour-intro'>
+                <p className='eyebrow'>The Underground Tour Map</p>
+                <h2>Pick a stop on the road</h2>
+                <p>Five cities, five venues, one route across the European metal underground. Click a stop to see what is happening there.</p>
             </div>
 
-            <div id='venue2button' className='venue2-button-overlay'>
-                <button>{venueNames.venue2}</button>
+            {error && <p className='tour-error'>Could not load the tour stops: {error}</p>}
+
+            <div className='tour-map'>
+                {/* viewBox sets the drawing's coordinate system; CSS scales it to fit the screen */}
+                <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role='group' aria-label='Road map of Europe with five tour stops'>
+
+                    {/* Base map, drawn back to front: sea, gridlines, land, country borders */}
+                    <rect className='map-sea' width={MAP_WIDTH} height={MAP_HEIGHT} />
+                    <path className='map-grid' d={gridPath} />
+                    <path className='map-land' d={landPath} />
+                    <path className='map-borders' d={borderPath} />
+
+                    {/* Background cities, only there to make it look like a road map */}
+                    {towns.map(town =>
+                        <g key={town.name} className='map-town'>
+                            <circle cx={town.x} cy={town.y} r='2' />
+                            <text x={town.x + 6} y={town.y + 4}>{town.name}</text>
+                        </g>
+                    )}
+
+                    {/* The road is the same path drawn three times, stacked:
+                        a thick black edge, red asphalt on top, then dashed lane markings */}
+                    <path className='map-route-casing' d={route} />
+                    <path className='map-route' d={route} />
+                    <path className='map-route-lane' d={route} />
+
+                    {/* One clickable pin per location */}
+                    {stops.map(stop =>
+                        <g
+                            key={stop.slug}
+                            className='map-stop'
+                            // --accent is a CSS variable, so each pin's styles use that region's color
+                            style={{ '--accent': stop.color }}
+                            // Move the whole pin group to the stop's map position
+                            transform={`translate(${stop.x} ${stop.y})`}
+                            // Make the pin behave like a link for keyboard and screen reader users
+                            role='link'
+                            tabIndex='0'
+                            aria-label={`Stop ${stop.stop}: ${stop.name}, ${stop.city}`}
+                            onClick={() => navigate(`/${stop.slug}`)}
+                            onKeyDown={(event) => handleKeyDown(event, stop.slug)}
+                        >
+                            <circle className='map-stop-halo' r='20' />
+                            <circle className='map-stop-pin' r='11' />
+                            <text className='map-stop-number' y='4'>{stop.stop}</text>
+
+                            {/* Venue name and city, placed left or right of the pin (set in regions.js) */}
+                            <g className={`map-stop-label ${stop.label}`}>
+                                <text className='map-stop-name' x={stop.label === 'left' ? -20 : 20} y='-2'>{stop.name}</text>
+                                <text className='map-stop-city' x={stop.label === 'left' ? -20 : 20} y='14'>{stop.city}, {stop.country}</text>
+                            </g>
+                        </g>
+                    )}
+
+                    {/* Compass in the bottom-left corner, with the north half in red */}
+                    <g className='map-compass' transform='translate(70 640)'>
+                        <circle r='30' />
+                        <path d='M 0 -26 L 7 0 L 0 26 L -7 0 Z' />
+                        <path className='north' d='M 0 -26 L 7 0 L -7 0 Z' />
+                        <text y='-36'>N</text>
+                    </g>
+
+                    {/* Legend in the top-left corner, explaining the map symbols */}
+                    <g className='map-legend' transform='translate(30 34)'>
+                        <path className='map-route-casing' d='M 0 0 L 44 0' />
+                        <path className='map-route' d='M 0 0 L 44 0' />
+                        <path className='map-route-lane' d='M 0 0 L 44 0' />
+                        <text x='56' y='5'>Tour route</text>
+                        <circle className='legend-pin' cx='22' cy='30' r='8' />
+                        <text x='56' y='35'>Tour stop</text>
+                        <circle className='legend-town' cx='22' cy='58' r='2.5' />
+                        <text x='56' y='63'>City</text>
+                    </g>
+                </svg>
             </div>
 
-            <div id='venue3button' className='venue3-button-overlay'>
-                <button>{venueNames.venue3}</button>
-            </div>
-
-            <div id='venue4button' className='venue4-button-overlay'>
-                <button>{venueNames.venue4}</button>
-            </div>
-
-            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000.32 500" xmlSpace="preserve">
-                <image id="background" xlinkHref={unitygrid} transform="matrix(0.48 0 0 0.48 0 0)"></image>
-                
-                <a href='/echolounge'><polygon id="venue1" points="2.97,234.52 17.94,198.9 34.45,188.58 52.52,191.68 56.65,196.32 69.03,162.26 84,137.48 
-                103.61,121.48 126.32,109.61 154.71,125.61 175.87,149.87 189.81,176.71 199.61,206.13 205.81,229.35 210.45,243.81 206.84,272.19 
-                214.58,285.1 214.58,302.13 203.74,334.13 194.45,351.68 205.29,366.65 132.52,366.65 159.35,391.42 155.74,399.68 119.61,399.68 
-                86.06,399.68 62.84,399.68 25.16,399.68 0,397.61 " /></a>
-                
-                <a href='/houseofblues'><polygon id="venue2" name='venue2' value={2} points="358.58,353.74 376.65,322.77 389.55,314.52 384.39,280.45 407.61,272.19 422.06,220.58 
-                438.58,126.65 449.42,38.39 457.68,16.71 468,35.81 474.19,103.42 491.74,203.03 508.26,261.87 517.03,281.48 517.03,214.9 
-                529.42,194.26 540.77,197.35 540.77,169.48 552.13,167.94 556.77,149.87 566.06,156.06 566.06,193.74 577.42,211.81 577.42,238.65 
-                601.16,254.65 594.45,302.13 575.87,335.68 587.23,353.74 601.16,363.55 358.58,363.55 " /></a>
-                
-                <a href='/pavilion'><polygon id="venue3" name='venue3' value={3} points="998.06,83.81 952.65,31.16 914.45,16.71 877.29,43.55 833.94,102.39 811.74,161.23 
-                796.77,241.23 802.97,303.16 833.94,353.23 871.61,385.23 954.71,385.23 1000.32,387.81 " /></a>
-
-                <a href='/americanairlines'><polygon id="venue4" name='venue4' value={4} points="625,291 615,305 608,318 625,338 637,354 622.5,358 673,363.5 751,363.5 793,363.5 
-                769,352 772,347 793,340 806,321 796.8,291 784,269 757,261 730,272 707,281 672,283 "/></a>
-            </svg>
-   
-        </div>
+            {/* The same stops as a list under the map, easier to tap on a phone */}
+            <ol className='tour-stops'>
+                {stops.map(stop =>
+                    <li key={stop.slug} style={{ '--accent': stop.color }}>
+                        <Link to={`/${stop.slug}`}>
+                            {/* padStart turns 1 into "01" */}
+                            <span className='tour-stop-number'>{String(stop.stop).padStart(2, '0')}</span>
+                            <span className='tour-stop-name'>{stop.name}</span>
+                            <span className='tour-stop-city'>{stop.city}, {stop.country}</span>
+                        </Link>
+                    </li>
+                )}
+            </ol>
+        </section>
     )
 }
 

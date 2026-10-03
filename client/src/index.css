@@ -1,78 +1,90 @@
-@import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800;900&display=swap');
+/* Global theme: colors, fonts and shared helpers used on every page */
 
-#root {
-    background: url('./assets/unitygrid.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
-    background-attachment: fixed;
-    background-color: var(--secondary-color);
-    font-family: Nunito Sans, Verdana, sans-serif;
-    height: 100vh;
-    --main-color: rgb(217, 29, 242);
-    --secondary-color: rgb(3, 1, 64);
-    --primary: var(--main-color);
-    --primary-hover: rgb(111, 28, 166);
-    --primary-focus: rgb(217, 29, 242);
-    --secondary: var(--secondary-color);
-    --secondary-hover: rgb(4, 66, 191);
-    --secondary-focus: rgb(111, 28, 166);
-    --h1-color: white;
-    --h2-color: white;
-    --h3-color: white;
-    --card-background-color: none;
-    --form-element-background-color: white;
-    --form-element-border-color: var(--main-color);
-    --form-element-color: black;
-    --form-element-placeholder-color: black;
-    --form-element-active-border-color: var(--secondary-color);
-    --form-element-active-background-color: white;
+/* Color and font variables. Every other CSS file uses these through var(--name),
+   so changing a color here changes it everywhere. */
+:root,
+[data-theme='dark'] {
+    --bg: #0b0b0c;
+    --panel: #141416;
+    --panel-raised: #1b1b1e;
+    --line: #2d2d32;
+    --bone: #e6e1d8;
+    --ash: #9a958d;
+    --steel: #8fa8bf;
+    --rust: #d0561f;
+    --blood: #d7263d;
+
+    --font-title: 'Metal Mania', 'Oswald', fantasy;
+    --font-heading: 'Oswald', 'Arial Narrow', sans-serif;
+    --font-body: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+
+    /* Pico overrides so its defaults match the theme */
+    --background-color: var(--bg);
+    --color: var(--bone);
+    --h1-color: var(--bone);
+    --h2-color: var(--bone);
+    --h3-color: var(--bone);
+    --muted-color: var(--ash);
+    --primary: var(--blood);
+    --primary-hover: #ef3b52;
+    --primary-focus: rgba(215, 38, 61, 0.35);
+    --card-background-color: var(--panel);
+    --font-family: var(--font-body);
+    --border-radius: 2px;
 }
 
-#root h1, #root h2, #root h3 {
-    text-transform: uppercase;
-    margin-bottom: 0px;
+body {
+    background-color: var(--bg);
+    color: var(--bone);
+    font-family: var(--font-body);
 }
 
-#root h1 {
-    font-family: Rock Salt, cursive;
-    font-size: 3em;
-    font-weight: bold;
-    text-shadow: 3px 3px 4px black;
-}
-
-#root h2 {
-    font-family: Nunito Sans, Verdana, sans-serif;
-    font-size: 2em;
-    font-weight: 800;
-}
-
+/* All headings: Oswald, uppercase, spaced out.
+   The #root prefix makes these win over Pico's own heading styles. */
+#root h1,
+#root h2,
 #root h3 {
-    font-family: Nunito Sans, Verdana, sans-serif;
-    font-size: 1.3em;
-    font-weight: 800;
-}
-
-#root main {
-    display: flex;
-    justify-content: center;
-}
-
-#root [role=button] {
+    font-family: var(--font-heading);
+    font-weight: 600;
     text-transform: uppercase;
-    font-weight: 900;
-    font-size: 1.5em;
-    border: 2px solid white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    letter-spacing: 0.04em;
+    margin-bottom: 0;
 }
 
-#root article {
-    padding: 0px;
+/* Small label above a heading, e.g. "TOUR STOP 04".
+   Uses the page's --accent color if one is set, otherwise blood red. */
+.eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent, var(--blood));
+    margin-bottom: 0.25rem;
 }
 
-#root select {
-    width: 400px;
+/* "Back to the map" link */
+.back-link {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ash);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+}
+
+/* Adds a left arrow and a space before the link text */
+.back-link::before {
+    content: '\2190\00a0';
+}
+
+.back-link:hover {
+    color: var(--bone);
+}
+
+/* Red outline on whatever has keyboard focus (when tabbing through the page) */
+:focus-visible {
+    outline: 2px solid var(--blood);
+    outline-offset: 3px;
 }

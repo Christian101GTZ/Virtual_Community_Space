@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- data-theme="dark" switches Pico CSS to its dark base styles -->
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://kit.fontawesome.com/c12ab8913c.js" crossorigin="anonymous"></script>
-    <title>UnityGrid Plaza</title>
+
+    <!-- Google Fonts: Metal Mania (site title), Oswald (headings), Barlow (body text).
+         The preconnect lines start the connection to Google early so the fonts load faster. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Oswald:wght@400;600&family=Barlow:wght@400;600&display=swap" rel="stylesheet" />
+
+    <!-- Text shown on the browser tab -->
+    <title>Riff Road</title>
   </head>
   <body>
+    <!-- React renders the whole app inside this div (see src/main.jsx) -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

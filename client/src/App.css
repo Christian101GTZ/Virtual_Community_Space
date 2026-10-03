@@ -1,33 +1,76 @@
+/* Page frame: background, top bar and main content area */
+
+/* Black background with a faint red glow at the top */
 .app {
-    background: url('./assets/unitygrid.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
-    background-attachment: fixed;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at top, rgba(215, 38, 61, 0.08), transparent 60%),
+        var(--bg);
 }
 
-header {
-    padding: 50px;
+/* Top bar: title on the left, nav on the right. flex-wrap moves the nav to
+   a second line on narrow screens; sticky keeps the bar on screen while scrolling.
+   clamp() picks a value between a minimum and maximum based on screen width. */
+.site-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem clamp(1rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: rgba(11, 11, 12, 0.92);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.main-header {
-    height: 30vh;
-    width: 85vw;
-    align-items: flex-end;
-    position: relative;
-    z-index: 1;
+/* "Riff Road" title in the Metal Mania font */
+#root .brand {
+    font-family: var(--font-title);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    margin: 0;
+    line-height: 1;
 }
 
-.header-buttons {
-    width: 30%;
+.brand a {
+    color: var(--bone);
+    text-decoration: none;
+    text-shadow: 0 0 18px rgba(215, 38, 61, 0.45);
+}
+
+.site-nav {
     display: flex;
-    justify-content: space-around;
+    gap: 0.5rem;
 }
 
-.header-buttons button {
-    margin-right: 20px;
-    margin-left: 20px;
+.site-nav a {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ash);
+    text-decoration: none;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid transparent;
+}
+
+.site-nav a:hover {
+    color: var(--bone);
+}
+
+/* NavLink adds the "active" class to the link for the current page */
+.site-nav a.active {
+    color: var(--bone);
+    border-color: var(--blood);
+}
+
+/* Centered content column, at most 1200px wide */
+.site-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem clamp(1rem, 4vw, 3rem) 4rem;
 }

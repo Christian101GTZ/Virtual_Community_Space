@@ -1,57 +1,84 @@
-.event-information {
-    position: relative;
-    width: 350px;
-    height: 350px;
-    padding: 0px;
-    margin: 20px;
-    border: 2px solid white;
-    border-radius: 0px;
+/* One event card (components/Event.jsx).
+   var(--accent, var(--blood)) uses the location's color, or blood red if none is set. */
+
+/* Resets Pico's default <article> margin, padding, rounded corners and shadow */
+.event-card {
+    margin: 0;
+    padding: 0;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
 }
 
-.event-information img {
+/* On hover the card lifts slightly and its border takes the accent color */
+.event-card:hover {
+    border-color: var(--accent, var(--blood));
+    transform: translateY(-3px);
+}
+
+/* Black and white photo that gets some color back on hover */
+.event-image img {
+    display: block;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
+    filter: grayscale(1) contrast(1.2) brightness(0.8);
+    transition: filter 0.3s;
 }
 
-.event-information-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 100%;
-    right: 0;
-    background-color: var(--primary);
-    overflow: hidden;
-    width: 0;
-    height: 100%;
-    transition: 0.5s ease;
+.event-card:hover .event-image img {
+    filter: grayscale(0.4) contrast(1.1) brightness(0.9);
 }
 
-.event-information:hover .event-information-overlay {
-    width: 100%;
-    left: 0;
+/* Bottom half: date block on the left, title and time on the right */
+.event-body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-top: 3px solid var(--accent, var(--blood));
 }
 
-.text {
-    position: absolute;
-    overflow: hidden;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+/* Calendar-style date: month, big day number, year, stacked */
+.event-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 3.2rem;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    line-height: 1;
 }
 
-.text i {
-    margin-right: 10px;
+.event-month {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--accent, var(--blood));
 }
 
-.text p {
-    color: white;
-    margin-top: 10px;
+.event-day {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--bone);
 }
 
-.negative-time-remaining {
-    background-color: red;
-    color: white;
-    font-weight: 700;
-    padding: 10px;
-    text-align: center;
+#root .event-text h3 {
+    font-size: 1.05rem;
+    line-height: 1.25;
+}
+
+.event-text p {
+    font-size: 0.85rem;
+    color: var(--ash);
+    margin: 0.4rem 0 0;
+}
+
+.event-year {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--ash);
+    margin-top: 0.2rem;
 }

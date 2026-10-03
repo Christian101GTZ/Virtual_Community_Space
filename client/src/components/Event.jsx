@@ -1,58 +1,41 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import '../css/Event.css'
 
-const Event = (props) => {
+// One event card. The parent page passes in the event's data as props.
+const Event = ({ title, date, image }) => {
+    // The database sends the date as a string like "2026-10-25T03:00:00.000Z".
+    // new Date() turns it into a Date object, shown in the viewer's own time zone.
+    const eventDate = new Date(date)
 
-    const [event, setEvent] = useState([])
-    const [time, setTime] = useState([])
-    const [remaining, setRemaining] = useState([])
+    // Split the date into the pieces the card shows: "Oct", "24", "Saturday", 2026
+    const month = eventDate.toLocaleDateString('en-US', { month: 'short' })
+    const day = eventDate.toLocaleDateString('en-US', { day: 'numeric' })
+    const weekday = eventDate.toLocaleDateString('en-US', { weekday: 'long' })
+    const year = eventDate.getFullYear()
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const eventData = await EventsAPI.getEventsById(props.id)
-                setEvent(eventData)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [])
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const result = await dates.formatTime(event.time)
-                setTime(result)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [event])
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const timeRemaining = await dates.formatRemainingTime(event.remaining)
-                setRemaining(timeRemaining)
-                dates.formatNegativeTimeRemaining(remaining, event.id)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [event])
+    // e.g. "8:00 PM"
+    const formattedTime = eventDate.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit'
+    })
 
     return (
-        <article className='event-information'>
-            <img src={event.image} />
+        <article className='event-card'>
+            <div className='event-image'>
+                <img src={image} alt={title} />
+            </div>
 
-            <div className='event-information-overlay'>
-                <div className='text'>
-                    <h3>{event.title}</h3>
-                    <p><i className="fa-regular fa-calendar fa-bounce"></i> {event.date} <br /> {time}</p>
-                    <p id={`remaining-${event.id}`}>{remaining}</p>
+            <div className='event-body'>
+                {/* Calendar-style date block on the left */}
+                <div className='event-date'>
+                    <span className='event-month'>{month}</span>
+                    <span className='event-day'>{day}</span>
+                    <span className='event-year'>{year}</span>
+                </div>
+
+                <div className='event-text'>
+                    <h3>{title}</h3>
+                    <p>{weekday}, {formattedTime}</p>
                 </div>
             </div>
         </article>
