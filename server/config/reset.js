@@ -47,24 +47,24 @@ const locations = [
 
 // location = the slug of the venue the event happens at
 const events = [
-    { location: 'uk', title: 'Bring Me The Horizon: Sheffield Homecoming', date: '2026-09-12 20:00', image: 'https://picsum.photos/seed/bmth/600/600' },
+    { location: 'uk', title: 'Bring Me The Horizon: Sheffield Homecoming', date: '2026-09-12 20:00', image: '/images/bmth.jpg' },
     { location: 'uk', title: 'Architects: Brighton to Sheffield Night', date: '2026-10-30 20:00', image: 'https://picsum.photos/seed/architects/600/600' },
 
     { location: 'central', title: 'Electric Callboy: Neon Rave Pit', date: '2026-09-19 21:00', image: 'https://picsum.photos/seed/callboy/600/600' },
     { location: 'central', title: 'Annisokay: Post-Hardcore Night', date: '2026-10-16 20:00', image: 'https://picsum.photos/seed/annisokay/600/600' },
     { location: 'central', title: 'Harakiri for the Sky: Dark Room Session', date: '2026-11-20 22:00', image: 'https://picsum.photos/seed/harakiri/600/600' },
 
-    { location: 'sweden', title: 'Meshuggah + Cult of Luna: Umeå Double Bill', date: '2026-08-29 19:30', image: 'https://picsum.photos/seed/meshuggah/600/600' },
+    { location: 'sweden', title: 'Meshuggah + Cult of Luna: Umeå Double Bill', date: '2026-08-29 19:30', image: '/images/cult-of-luna.jpg' },
     { location: 'sweden', title: 'Imminence: Strings & Breakdowns', date: '2026-10-24 20:00', image: 'https://picsum.photos/seed/imminence/600/600' },
     { location: 'sweden', title: 'Opeth: Acoustic & Electric Evening', date: '2026-12-05 19:00', image: 'https://picsum.photos/seed/opeth/600/600' },
 
-    { location: 'nordic', title: 'Swallow the Sun: Winter Doom Mass', date: '2026-09-26 20:00', image: 'https://picsum.photos/seed/swallow/600/600' },
+    { location: 'nordic', title: 'Swallow the Sun: Winter Doom Mass', date: '2026-09-26 20:00', image: '/images/swallow-the-sun.jpg' },
     { location: 'nordic', title: 'Hour of the Nightingale: Trees of Eternity Tribute Night', date: '2026-11-07 19:00', image: 'https://picsum.photos/seed/trees/600/600' },
     { location: 'nordic', title: 'MØL: Blackgaze at the Lake', date: '2026-11-28 20:00', image: 'https://picsum.photos/seed/mol/600/600' },
 
-    { location: 'france', title: 'Alcest: Sunset Set', date: '2026-09-05 19:00', image: 'https://picsum.photos/seed/alcest/600/600' },
+    { location: 'france', title: 'Alcest: Sunset Set', date: '2026-09-05 19:00', image: '/images/alcest.jpg' },
     { location: 'france', title: 'Resolve: Prog Metalcore Showcase', date: '2026-10-10 20:00', image: 'https://picsum.photos/seed/resolve/600/600' },
-    { location: 'france', title: 'Gojira: Ocean Benefit Show', date: '2026-11-14 20:30', image: 'https://picsum.photos/seed/gojira/600/600' }
+    { location: 'france', title: 'Gojira: Ocean Benefit Show', date: '2026-11-14 20:30', image: '/images/gojira.jpg' }
 ]
 
 // ---------- TABLES ----------
